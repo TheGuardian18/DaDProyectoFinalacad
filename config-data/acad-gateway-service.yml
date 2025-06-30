@@ -1,0 +1,46 @@
+server:
+  port: 8085
+
+eureka:
+  client:
+    serviceUrl:
+      #defaultZone: http://localhost:8090/eureka
+      defaultZone: ${EUREKA_URI:http://localhost:8090/eureka}
+
+  instance:
+    #hostname: localhost
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: acad-Institucion
+          uri: lb://acad-Institucion_db
+          predicates:
+            - Path=/institucion/**
+          filters:
+            - AuthFilter
+
+        - id: acad-ugel
+          uri: lb://acad_ugel_db
+          predicates:
+            - Path=/ugeles/**
+          filters:
+            - AuthFilter
+
+        - id: acad-Sede
+          uri: lb://acad_Sede_db
+          predicates:
+            - Path=/sedes/**
+          filters:
+            - AuthFilter
+
+
+        - id: acad-auth-service
+          uri: lb://acad-auth-service
+          predicates:
+            - Path=/auth/**
