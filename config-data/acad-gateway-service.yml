@@ -26,14 +26,14 @@ spring:
             - AuthFilter
 
         - id: acad-ugel
-          uri: lb://acad_ugel
+          uri: lb://acad-ugel
           predicates:
             - Path=/ugeles/**
           filters:
             - AuthFilter
 
         - id: acad-Sede
-          uri: lb://acad_Sede
+          uri: lb://acad-Sede
           predicates:
             - Path=/sedes/**
           filters:
