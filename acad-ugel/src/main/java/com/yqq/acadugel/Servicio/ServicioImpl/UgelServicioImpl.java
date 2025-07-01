@@ -21,7 +21,7 @@ public class UgelServicioImpl implements UgelServicio {
 
     @Override
     public Ugel findById(Integer id) {
-        return ugelRepository.findById(id).orElse(null);
+        return ugelRepository.findById(Long.valueOf(id)).orElse(null);
     }
 
     @Override
@@ -31,6 +31,6 @@ public class UgelServicioImpl implements UgelServicio {
 
     @Override
     public void deleteById(Integer id) {
-        ugelRepository.deleteById(id);
+        ugelRepository.deleteById(Long.valueOf(id));
     }
 }

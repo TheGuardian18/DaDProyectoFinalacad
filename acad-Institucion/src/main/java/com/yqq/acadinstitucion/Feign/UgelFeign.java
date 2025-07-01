@@ -7,5 +7,5 @@ import org.springframework.web.bind.annotation.GetMapping;
 @FeignClient(name = "acad-ugel")
 public interface UgelFeign {
     @GetMapping("/ugeles/{id}")
-    UgelDto getUgelById();
+    UgelDto getUgelById(Integer ugelId);
 }

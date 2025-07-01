@@ -12,4 +12,6 @@ public interface InstitucionServicio {
     List<InstitucionDto> getAll();
 
     InstitucionDto getById(Integer id);
+
+    String getNombreSedeById(Long idSede); // ✅ agregado
 }

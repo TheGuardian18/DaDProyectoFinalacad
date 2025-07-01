@@ -18,7 +18,7 @@ import java.util.List;
 public class InstitucionServicioImpl implements InstitucionServicio {
 
     private final InstitucionRepository repository;
-    private final UgelFeign ugelFeign;     // ✅ corregido
+    private final UgelFeign ugelFeign;
     private final SedeFeign sedeFeign;
 
     @Override
@@ -42,12 +42,18 @@ public class InstitucionServicioImpl implements InstitucionServicio {
         return mapToResponse(i);
     }
 
+    @Override
+    public String getNombreSedeById(Long idSede) {
+        SedeDto sede = sedeFeign.getSedeById(idSede);
+        return (sede != null) ? sede.getNombreSede() : "Sede no encontrada";
+    }
+
     private InstitucionDto mapToResponse(Institucion i) {
-        UgelDto ugel = ugelFeign.getUgelById();   // ✅ corregido
+        UgelDto ugel = ugelFeign.getUgelById(i.getUgelId());
         SedeDto sede = sedeFeign.getSedeById(i.getSedeId());
 
         return InstitucionDto.builder()
-                .id(i.getIdInstitution ())
+                .id(i.getIdInstitution())
                 .nombre(i.getNombre())
                 .direccion(i.getDireccion())
                 .ugel(ugel)
