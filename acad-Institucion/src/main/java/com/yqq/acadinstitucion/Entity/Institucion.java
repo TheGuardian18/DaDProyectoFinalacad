@@ -31,4 +31,12 @@ public class Institucion {
 
     public Long getUgelId() { return ugelId; }
     public void setUgelId(Long ugelId) { this.ugelId = ugelId; }
+    public Institucion(Long id, String nombre, String direccion, Long sedeId, Long ugelId) {
+        this.id = id;
+        this.nombre = nombre;
+        this.direccion = direccion;
+        this.sedeId = sedeId;
+        this.ugelId = ugelId;
+    }
+
 }

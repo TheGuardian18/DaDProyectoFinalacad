@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InstitucionServiceImpl implements InstitucionService {
@@ -33,6 +34,27 @@ public class InstitucionServiceImpl implements InstitucionService {
     }
 
     @Override
+    public List<Institucion> listar() {
+        return institucionRepository.findAll();
+    }
+
+    @Override
+    public Institucion buscar(Long id) {
+        Optional<Institucion> optional = institucionRepository.findById(id);
+        return optional.orElse(null);
+    }
+
+    @Override
+    public Institucion actualizar(Institucion institucion) {
+        return institucionRepository.save(institucion);
+    }
+
+    @Override
+    public void eliminar(Long id) {
+        institucionRepository.deleteById(id);
+    }
+
+    @Override
     @CircuitBreaker(name = "buscarInstitucionPorNombreCB", fallbackMethod = "fallbackBuscarPorNombre")
     public List<InstitucionResponse> findByNombre(String nombre) {
         List<Institucion> instituciones = institucionRepository.findByNombreContainingIgnoreCase(nombre);
@@ -44,18 +66,20 @@ public class InstitucionServiceImpl implements InstitucionService {
             response.setNombre(institucion.getNombre());
             response.setDireccion(institucion.getDireccion());
 
-            // Llamadas Feign para obtener nombres
+            // Feign para Sede
             SedeDto sede = null;
-            UgelDto ugel = null;
             try {
                 sede = sedeFeign.getSedeById(institucion.getSedeId());
             } catch (Exception e) {
-                // Manejo de error (puedes registrar el error)
+                // Puedes registrar el error si deseas
             }
+
+            // Feign para UGEL
+            UgelDto ugel = null;
             try {
                 ugel = ugelFeign.getUgelById(institucion.getUgelId());
             } catch (Exception e) {
-                // Manejo de error
+                // También puedes registrar el error aquí
             }
 
             response.setNombreSede(sede != null ? sede.getNombreSede() : "Sede no disponible");
