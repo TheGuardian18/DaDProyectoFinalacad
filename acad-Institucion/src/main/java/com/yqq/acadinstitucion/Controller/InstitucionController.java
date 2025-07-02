@@ -1,33 +1,28 @@
 package com.yqq.acadinstitucion.Controller;
 
-import com.yqq.acadinstitucion.Dto.InstitucionDto;
+import com.yqq.acadinstitucion.Dto.InstitucionResponse;
 import com.yqq.acadinstitucion.Entity.Institucion;
-import com.yqq.acadinstitucion.Servicio.InstitucionServicio;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import com.yqq.acadinstitucion.Servicio.InstitucionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/instituciones")
-@RequiredArgsConstructor
+@RequestMapping("/institucion")
+@CrossOrigin("*")
 public class InstitucionController {
 
-    private final InstitucionServicio servicio;
+    @Autowired
+    private InstitucionService institucionService;
 
     @PostMapping
-    public ResponseEntity<InstitucionDto> save(@RequestBody Institucion institucion) {
-        return ResponseEntity.ok(servicio.save(institucion));
+    public Institucion crear(@RequestBody Institucion institucion) {
+        return institucionService.save(institucion);
     }
 
-    @GetMapping
-    public ResponseEntity<List<InstitucionDto>> getAll() {
-        return ResponseEntity.ok(servicio.getAll());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<InstitucionDto> getById(@PathVariable Integer id) {
-        return ResponseEntity.ok(servicio.getById(id));
+    @GetMapping("/buscar")
+    public List<InstitucionResponse> buscarPorNombre(@RequestParam String nombre) {
+        return institucionService.findByNombre(nombre);
     }
 }
