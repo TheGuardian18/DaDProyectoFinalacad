@@ -11,10 +11,24 @@ public class Institucion {
     private Long id;
 
     private String nombre;
+
     private String direccion;
 
+    @Column(name = "sede_id")
     private Long sedeId;
+
+    @Column(name = "ugel_id")
     private Long ugelId;
+
+    public Institucion() {}
+
+    public Institucion(Long id, String nombre, String direccion, Long sedeId, Long ugelId) {
+        this.id = id;
+        this.nombre = nombre;
+        this.direccion = direccion;
+        this.sedeId = sedeId;
+        this.ugelId = ugelId;
+    }
 
     // Getters y Setters
     public Long getId() { return id; }
@@ -31,12 +45,4 @@ public class Institucion {
 
     public Long getUgelId() { return ugelId; }
     public void setUgelId(Long ugelId) { this.ugelId = ugelId; }
-    public Institucion(Long id, String nombre, String direccion, Long sedeId, Long ugelId) {
-        this.id = id;
-        this.nombre = nombre;
-        this.direccion = direccion;
-        this.sedeId = sedeId;
-        this.ugelId = ugelId;
-    }
-
 }

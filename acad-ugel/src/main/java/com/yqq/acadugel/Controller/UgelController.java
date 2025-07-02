@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/ugeles")
-@CrossOrigin("*")
+
 public class UgelController {
 
     @Autowired

@@ -7,21 +7,24 @@ import java.util.List;
 
 public interface InstitucionService {
 
-    // Crear
+    // Crear nueva institución
     Institucion save(Institucion institucion);
 
-    // Leer todos
+    // Obtener todas las instituciones
     List<Institucion> listar();
 
-    // Leer uno por ID
+    // Buscar institución por ID
     Institucion buscar(Long id);
 
-    // Actualizar
+    // Actualizar institución existente
     Institucion actualizar(Institucion institucion);
 
-    // Eliminar
+    // Eliminar institución por ID
     void eliminar(Long id);
 
-    // Buscar por nombre (adicional)
+    // Buscar instituciones por nombre (usa DTO con sede y ugel)
     List<InstitucionResponse> findByNombre(String nombre);
+
+    // Listar todas las instituciones con nombre de sede y ugel (DTO)
+    List<InstitucionResponse> findAllConDatosCompletos();
 }

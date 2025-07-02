@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class InstitucionServiceImpl implements InstitucionService {
@@ -40,17 +39,23 @@ public class InstitucionServiceImpl implements InstitucionService {
 
     @Override
     public Institucion buscar(Long id) {
-        Optional<Institucion> optional = institucionRepository.findById(id);
-        return optional.orElse(null);
+        return institucionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Institución con ID " + id + " no encontrada"));
     }
 
     @Override
     public Institucion actualizar(Institucion institucion) {
+        if (!institucionRepository.existsById(institucion.getId())) {
+            throw new RuntimeException("No se puede actualizar. Institución no encontrada con ID: " + institucion.getId());
+        }
         return institucionRepository.save(institucion);
     }
 
     @Override
     public void eliminar(Long id) {
+        if (!institucionRepository.existsById(id)) {
+            throw new RuntimeException("No se puede eliminar. Institución no encontrada con ID: " + id);
+        }
         institucionRepository.deleteById(id);
     }
 
@@ -58,6 +63,18 @@ public class InstitucionServiceImpl implements InstitucionService {
     @CircuitBreaker(name = "buscarInstitucionPorNombreCB", fallbackMethod = "fallbackBuscarPorNombre")
     public List<InstitucionResponse> findByNombre(String nombre) {
         List<Institucion> instituciones = institucionRepository.findByNombreContainingIgnoreCase(nombre);
+        return mapearAResponse(instituciones);
+    }
+
+    @Override
+    @CircuitBreaker(name = "listarInstitucionesCB", fallbackMethod = "fallbackListarInstituciones")
+    public List<InstitucionResponse> findAllConDatosCompletos() {
+        List<Institucion> instituciones = institucionRepository.findAll();
+        return mapearAResponse(instituciones);
+    }
+
+    // Método reutilizable para convertir entidades a respuestas completas
+    private List<InstitucionResponse> mapearAResponse(List<Institucion> instituciones) {
         List<InstitucionResponse> responses = new ArrayList<>();
 
         for (Institucion institucion : instituciones) {
@@ -66,20 +83,24 @@ public class InstitucionServiceImpl implements InstitucionService {
             response.setNombre(institucion.getNombre());
             response.setDireccion(institucion.getDireccion());
 
-            // Feign para Sede
+            // Obtener datos de la sede
             SedeDto sede = null;
             try {
-                sede = sedeFeign.getSedeById(institucion.getSedeId());
+                if (institucion.getSedeId() != null) {
+                    sede = sedeFeign.getSedeById(institucion.getSedeId());
+                }
             } catch (Exception e) {
-                // Puedes registrar el error si deseas
+                System.out.println("⚠️ Error al obtener sede con ID " + institucion.getSedeId() + ": " + e.getMessage());
             }
 
-            // Feign para UGEL
+            // Obtener datos de la ugel
             UgelDto ugel = null;
             try {
-                ugel = ugelFeign.getUgelById(institucion.getUgelId());
+                if (institucion.getUgelId() != null) {
+                    ugel = ugelFeign.getUgelById(institucion.getUgelId());
+                }
             } catch (Exception e) {
-                // También puedes registrar el error aquí
+                System.out.println("⚠️ Error al obtener UGEL con ID " + institucion.getUgelId() + ": " + e.getMessage());
             }
 
             response.setNombreSede(sede != null ? sede.getNombreSede() : "Sede no disponible");
@@ -91,7 +112,18 @@ public class InstitucionServiceImpl implements InstitucionService {
         return responses;
     }
 
+    // Fallbacks en caso de fallo en el CircuitBreaker
     public List<InstitucionResponse> fallbackBuscarPorNombre(String nombre, Throwable throwable) {
+        System.out.println("❌ Fallback activado en findByNombre(): " + throwable.getMessage());
+        return generarListaFallback();
+    }
+
+    public List<InstitucionResponse> fallbackListarInstituciones(Throwable throwable) {
+        System.out.println("❌ Fallback activado en findAllConDatosCompletos(): " + throwable.getMessage());
+        return generarListaFallback();
+    }
+
+    private List<InstitucionResponse> generarListaFallback() {
         InstitucionResponse fallback = new InstitucionResponse();
         fallback.setNombre("Servicio no disponible");
         fallback.setDireccion("-");
